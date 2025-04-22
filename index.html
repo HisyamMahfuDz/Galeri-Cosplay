@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galeri Fotoku</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Background anime blur */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: url('anime-bg.jpg') no-repeat center center/cover;
+      filter: blur(10px) brightness(0.6);
+      z-index: -1;
+    }
+
+    h1 {
+      text-align: center;
+      color: white;
+      margin-top: 20px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      padding: 20px;
+    }
+    .gallery img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .gallery img:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+    }
+
+    .lightbox {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .lightbox img {
+      max-width: 90%;
+      max-height: 80%;
+      border-radius: 10px;
+      box-shadow: 0 0 15px #fff;
+    }
+    .controls {
+      margin-top: 20px;
+    }
+    .controls button {
+      background: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 0 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Galeri Fotoku</h1>
+  <div class="gallery" id="gallery">
+    <img src="foto1.jpg" alt="Foto 1" onclick="openLightbox(0)" />
+    <img src="foto2.jpg" alt="Foto 2" onclick="openLightbox(1)" />
+    <img src="foto3.jpg" alt="Foto 3" onclick="openLightbox(2)" />
+  </div>
+
+  <div class="lightbox" onclick="closeLightbox()" id="lightbox">
+    <img id="lightbox-img" src="" onclick="event.stopPropagation()" />
+    <div class="controls" onclick="event.stopPropagation()">
+      <button onclick="prevImage()">Prev</button>
+      <button onclick="nextImage()">Next</button>
+    </div>
+  </div>
+
+  <script>
+    const imageList = [
+      "foto1.jpg",
+      "foto2.jpg",
+      "foto3.jpg"
+    ];
+    let currentIndex = 0;
+
+    function openLightbox(index) {
+      currentIndex = index;
+      document.getElementById("lightbox-img").src = imageList[currentIndex];
+      document.getElementById("lightbox").style.display = "flex";
+    }
+
+    function closeLightbox() {
+      document.getElementById("lightbox").style.display = "none";
+    }
+
+    function nextImage() {
+      currentIndex = (currentIndex + 1) % imageList.length;
+      document.getElementById("lightbox-img").src = imageList[currentIndex];
+    }
+
+    function prevImage() {
+      currentIndex = (currentIndex - 1 + imageList.length) % imageList.length;
+      document.getElementById("lightbox-img").src = imageList[currentIndex];
+    }
+  </script>
+</body>
+</html>
