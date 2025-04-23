@@ -164,7 +164,7 @@
 
         imageList.forEach((src, index) => {
           const img = document.createElement("img");
-          img.src = src;
+          img.src = src + "&t=" + new Date().getTime(); // Cegah cache
           img.alt = "Foto " + (index + 1);
           img.onclick = () => openLightbox(index);
           gallery.appendChild(img);
@@ -184,16 +184,4 @@
 
   function nextImage() {
     currentIndex = (currentIndex + 1) % imageList.length;
-    document.getElementById("lightbox-img").src = imageList[currentIndex];
-  }
-
-  function prevImage() {
-    currentIndex = (currentIndex - 1 + imageList.length) % imageList.length;
-    document.getElementById("lightbox-img").src = imageList[currentIndex];
-  }
-
-  // Load galeri saat pertama kali
-  loadGallery();
-</script>
-</body>
-</html>
+    document.getElementById("lightbox-img").src = imageList[currentIndex
