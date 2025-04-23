@@ -160,7 +160,7 @@
     reader.onload = function () {
       const base64Data = reader.result.split(',')[1];
 
-      fetch("https://script.google.com/macros/s/AKfycbxonpTKNX8vUUhgz0Xe-9llKXqDWPFsYhx98kHecO5xtoyYnVyQAGWX5zPylk4v02K5HA/exec", {
+      fetch("https://script.google.com/macros/s/AKfycbxG_cFlz8vPkCqaZhBrMaBV_2ohk7AgLHCuNGCjsmURZpUTN5UIxCpjxeF01AsfM9fn/exec", {
         method: "POST",
         body: new URLSearchParams({
           file: base64Data,
