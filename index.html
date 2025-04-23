@@ -99,7 +99,7 @@
   <form id="uploadForm">
     <input type="file" id="fileInput" />
     <button type="submit">Upload Foto</button>
-    <p id="uploadStatus"></p>
+    <p id="uploadStatus" style="color:white;"></p>
   </form>
 
   <!-- Gallery -->
@@ -114,18 +114,63 @@
     </div>
   </div>
 
-<script src="https://script.google.com/macros/s/AKfycbzXVnibrie2ByHtss0uiQ919YkjOd5izeO--HupWG0H8awS5UOS5QRjQvM25LhD_aDD/exec"></script>
 <script>
+  const webAppURL = "https://script.google.com/macros/s/AKfycbx-Ic3XvJEXRO-pNir_CdU2aaICbrYg84-ed9z_QTYQgVc1uWJMYtwhTS-bOo-0z-wQyQ/exec";
   let currentIndex = 0;
+  let imageList = [];
 
-  const gallery = document.getElementById("gallery");
-  imageList.forEach((src, index) => {
-    const img = document.createElement("img");
-    img.src = src;
-    img.alt = "Foto " + (index + 1);
-    img.onclick = () => openLightbox(index);
-    gallery.appendChild(img);
+  // Upload Function
+  document.getElementById("uploadForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    if (!file) return alert("Pilih file dulu");
+
+    reader.onload = function () {
+      const base64Data = reader.result.split(',')[1];
+
+      fetch(webAppURL, {
+        method: "POST",
+        body: new URLSearchParams({
+          file: base64Data,
+          name: file.name,
+          type: file.type
+        })
+      })
+      .then(res => res.text())
+      .then(url => {
+        document.getElementById("uploadStatus").innerText = "Berhasil diupload: " + url;
+        loadGallery(); // Refresh galeri setelah upload
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Upload gagal!");
+      });
+    };
+
+    reader.readAsDataURL(file);
   });
+
+  function loadGallery() {
+    fetch(webAppURL)
+      .then(res => res.json())
+      .then(images => {
+        const gallery = document.getElementById("gallery");
+        gallery.innerHTML = '';
+        imageList = images.map(img => img.url);
+
+        imageList.forEach((src, index) => {
+          const img = document.createElement("img");
+          img.src = src;
+          img.alt = "Foto " + (index + 1);
+          img.onclick = () => openLightbox(index);
+          gallery.appendChild(img);
+        });
+      });
+  }
 
   function openLightbox(index) {
     currentIndex = index;
@@ -147,40 +192,8 @@
     document.getElementById("lightbox-img").src = imageList[currentIndex];
   }
 
-  // Upload Function
-  document.getElementById("uploadForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    const fileInput = document.getElementById("fileInput");
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-
-    if (!file) return alert("Pilih file dulu");
-
-    reader.onload = function () {
-      const base64Data = reader.result.split(',')[1];
-
-      fetch("https://script.google.com/macros/s/AKfycbxG_cFlz8vPkCqaZhBrMaBV_2ohk7AgLHCuNGCjsmURZpUTN5UIxCpjxeF01AsfM9fn/exec", {
-        method: "POST",
-        body: new URLSearchParams({
-          file: base64Data,
-          name: file.name,
-          type: file.type
-        })
-      })
-      .then(res => res.text())
-      .then(url => {
-        document.getElementById("uploadStatus").innerText = "Berhasil diupload: " + url;
-        alert("Upload berhasil!");
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Upload gagal!");
-      });
-    };
-
-    reader.readAsDataURL(file);
-  });
+  // Load galeri saat pertama kali
+  loadGallery();
 </script>
 </body>
 </html>
