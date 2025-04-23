@@ -2,186 +2,67 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Galeri Cosplay</title>
   <style>
     body {
+      background: url('https://source.unsplash.com/1600x900/?cosplay') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
       font-family: sans-serif;
-      margin: 0;
-      padding: 0;
-      position: relative;
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: url('anime-bg.jpg') no-repeat center center/cover;
-      filter: blur(10px) brightness(0.6);
-      z-index: -1;
-    }
-
-    h1 {
       text-align: center;
-      color: white;
-      margin-top: 20px;
     }
-
-    form {
-      text-align: center;
-      margin: 20px auto;
-      color: white;
-    }
-
     .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 15px;
-      padding: 20px;
-    }
-
-    .gallery img {
-      width: 100%;
-      height: auto;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .gallery img:hover {
-      transform: scale(1.03);
-      box-shadow: 0 4px 12px rgba(255,255,255,0.3);
-    }
-
-    .lightbox {
-      display: none;
-      position: fixed;
-      z-index: 999;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.8);
+      display: flex;
+      flex-wrap: wrap;
       justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
-
-    .lightbox img {
-      max-width: 90%;
-      max-height: 80%;
-      border-radius: 10px;
-      box-shadow: 0 0 15px #fff;
-    }
-
-    .controls {
       margin-top: 20px;
     }
-
-    .controls button {
-      background: white;
-      border: none;
-      padding: 10px 20px;
-      margin: 0 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 16px;
+    .gallery img {
+      width: 200px;
+      height: auto;
+      margin: 10px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
     }
   </style>
 </head>
 <body>
   <h1>Galeri Cosplay</h1>
-
-  <!-- Upload Form -->
   <form id="uploadForm">
     <input type="file" id="fileInput" />
     <button type="submit">Upload Foto</button>
-    <p id="uploadStatus" style="color:white;"></p>
   </form>
 
-  <!-- Gallery -->
   <div class="gallery" id="gallery"></div>
 
-  <!-- Lightbox -->
-  <div class="lightbox" onclick="closeLightbox()" id="lightbox">
-    <img id="lightbox-img" src="" onclick="event.stopPropagation()" />
-    <div class="controls" onclick="event.stopPropagation()">
-      <button onclick="prevImage()">Prev</button>
-      <button onclick="nextImage()">Next</button>
-    </div>
-  </div>
+  <script>
+    const webAppURL = "https://script.google.com/macros/s/AKfycbxu51QTAXMdje5YfGf1ZCVQoxMUYsDFYe3X_aEHsH5vXzu-aueCzCJ46_bL2YbYCfAyIQ/exec";
 
-<script>
-  const webAppURL = "https://script.google.com/macros/s/AKfycbxu51QTAXMdje5YfGf1ZCVQoxMUYsDFYe3X_aEHsH5vXzu-aueCzCJ46_bL2YbYCfAyIQ/exec";
-  let currentIndex = 0;
-  let imageList = [];
+    function loadImages() {
+      fetch(webAppURL)
+        .then(res => res.json())
+        .then(images => {
+          console.log("Images fetched:", images);
+          const gallery = document.getElementById("gallery");
+          gallery.innerHTML = "";
 
-  // Upload Function
-  document.getElementById("uploadForm").addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    const fileInput = document.getElementById("fileInput");
-    const file = fileInput.files[0];
-    const reader = new FileReader();
-
-    if (!file) return alert("Pilih file dulu");
-
-    reader.onload = function () {
-      const base64Data = reader.result.split(',')[1];
-
-      fetch(webAppURL, {
-        method: "POST",
-        body: new URLSearchParams({
-          file: base64Data,
-          name: file.name,
-          type: file.type
+          images.forEach(img => {
+            if (img.url.match(/\.(jpg|jpeg|png|gif)$/i)) {
+              const imageEl = document.createElement("img");
+              imageEl.src = img.url;
+              imageEl.alt = img.name;
+              gallery.appendChild(imageEl);
+            }
+          });
         })
-      })
-      .then(res => res.text())
-      .then(url => {
-        document.getElementById("uploadStatus").innerText = "Berhasil diupload: " + url;
-        loadGallery(); // Refresh galeri setelah upload
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Upload gagal!");
-      });
-    };
-
-    reader.readAsDataURL(file);
-  });
-
-  function loadGallery() {
-    fetch(webAppURL)
-      .then(res => res.json())
-      .then(images => {
-        const gallery = document.getElementById("gallery");
-        gallery.innerHTML = '';
-        imageList = images.map(img => img.url);
-
-        imageList.forEach((src, index) => {
-          const img = document.createElement("img");
-          img.src = src + "&t=" + new Date().getTime(); // Cegah cache
-          img.alt = "Foto " + (index + 1);
-          img.onclick = () => openLightbox(index);
-          gallery.appendChild(img);
+        .catch(err => {
+          console.error("Error loading images:", err);
         });
-      });
-  }
+    }
 
-  function openLightbox(index) {
-    currentIndex = index;
-    document.getElementById("lightbox-img").src = imageList[currentIndex];
-    document.getElementById("lightbox").style.display = "flex";
-  }
-
-  function closeLightbox() {
-    document.getElementById("lightbox").style.display = "none";
-  }
-
-  function nextImage() {
-    currentIndex = (currentIndex + 1) % imageList.length;
-    document.getElementById("lightbox-img").src = imageList[currentIndex
+    // Auto-load images on page load
+    window.addEventListener("DOMContentLoaded", loadImages);
+  </script>
+</body>
+</html>
