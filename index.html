@@ -13,7 +13,6 @@
       overflow-x: hidden;
     }
 
-    /* Background anime blur */
     body::before {
       content: "";
       position: fixed;
@@ -32,12 +31,19 @@
       margin-top: 20px;
     }
 
+    form {
+      text-align: center;
+      margin: 20px auto;
+      color: white;
+    }
+
     .gallery {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 15px;
       padding: 20px;
     }
+
     .gallery img {
       width: 100%;
       height: auto;
@@ -45,6 +51,7 @@
       cursor: pointer;
       transition: 0.3s;
     }
+
     .gallery img:hover {
       transform: scale(1.03);
       box-shadow: 0 4px 12px rgba(255,255,255,0.3);
@@ -62,15 +69,18 @@
       align-items: center;
       flex-direction: column;
     }
+
     .lightbox img {
       max-width: 90%;
       max-height: 80%;
       border-radius: 10px;
       box-shadow: 0 0 15px #fff;
     }
+
     .controls {
       margin-top: 20px;
     }
+
     .controls button {
       background: white;
       border: none;
@@ -84,10 +94,18 @@
 </head>
 <body>
   <h1>Galeri Cosplay</h1>
-  <div class="gallery" id="gallery">
-   <!-- Gambar akan diisi otomatis lewat JavaScript -->
-  </div>
 
+  <!-- Upload Form -->
+  <form id="uploadForm">
+    <input type="file" id="fileInput" />
+    <button type="submit">Upload Foto</button>
+    <p id="uploadStatus"></p>
+  </form>
+
+  <!-- Gallery -->
+  <div class="gallery" id="gallery"></div>
+
+  <!-- Lightbox -->
   <div class="lightbox" onclick="closeLightbox()" id="lightbox">
     <img id="lightbox-img" src="" onclick="event.stopPropagation()" />
     <div class="controls" onclick="event.stopPropagation()">
@@ -128,6 +146,41 @@
     currentIndex = (currentIndex - 1 + imageList.length) % imageList.length;
     document.getElementById("lightbox-img").src = imageList[currentIndex];
   }
+
+  // Upload Function
+  document.getElementById("uploadForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    if (!file) return alert("Pilih file dulu");
+
+    reader.onload = function () {
+      const base64Data = reader.result.split(',')[1];
+
+      fetch("https://script.google.com/macros/s/AKfycbxonpTKNX8vUUhgz0Xe-9llKXqDWPFsYhx98kHecO5xtoyYnVyQAGWX5zPylk4v02K5HA/exec", {
+        method: "POST",
+        body: new URLSearchParams({
+          file: base64Data,
+          name: file.name,
+          type: file.type
+        })
+      })
+      .then(res => res.text())
+      .then(url => {
+        document.getElementById("uploadStatus").innerText = "Berhasil diupload: " + url;
+        alert("Upload berhasil!");
+      })
+      .catch(err => {
+        console.error(err);
+        alert("Upload gagal!");
+      });
+    };
+
+    reader.readAsDataURL(file);
+  });
 </script>
 </body>
 </html>
