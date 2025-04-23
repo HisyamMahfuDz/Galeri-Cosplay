@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Galeri Fotoku</title>
+  <title>Galeri Cosplay</title>
   <style>
     body {
       font-family: sans-serif;
@@ -83,11 +83,9 @@
   </style>
 </head>
 <body>
-  <h1>Galeri Fotoku</h1>
+  <h1>Galeri Cosplay</h1>
   <div class="gallery" id="gallery">
-    <img src="foto1.jpg" alt="Foto 1" onclick="openLightbox(0)" />
-    <img src="foto2.jpg" alt="Foto 2" onclick="openLightbox(1)" />
-    <img src="foto3.jpg" alt="Foto 3" onclick="openLightbox(2)" />
+   <!-- Gambar akan diisi otomatis lewat JavaScript -->
   </div>
 
   <div class="lightbox" onclick="closeLightbox()" id="lightbox">
@@ -98,33 +96,38 @@
     </div>
   </div>
 
-  <script>
-    const imageList = [
-      "foto1.jpg",
-      "foto2.jpg",
-      "foto3.jpg"
-    ];
-    let currentIndex = 0;
+<script src="imageList.js"></script>
+<script>
+  let currentIndex = 0;
 
-    function openLightbox(index) {
-      currentIndex = index;
-      document.getElementById("lightbox-img").src = imageList[currentIndex];
-      document.getElementById("lightbox").style.display = "flex";
-    }
+  const gallery = document.getElementById("gallery");
+  imageList.forEach((src, index) => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = "Foto " + (index + 1);
+    img.onclick = () => openLightbox(index);
+    gallery.appendChild(img);
+  });
 
-    function closeLightbox() {
-      document.getElementById("lightbox").style.display = "none";
-    }
+  function openLightbox(index) {
+    currentIndex = index;
+    document.getElementById("lightbox-img").src = imageList[currentIndex];
+    document.getElementById("lightbox").style.display = "flex";
+  }
 
-    function nextImage() {
-      currentIndex = (currentIndex + 1) % imageList.length;
-      document.getElementById("lightbox-img").src = imageList[currentIndex];
-    }
+  function closeLightbox() {
+    document.getElementById("lightbox").style.display = "none";
+  }
 
-    function prevImage() {
-      currentIndex = (currentIndex - 1 + imageList.length) % imageList.length;
-      document.getElementById("lightbox-img").src = imageList[currentIndex];
-    }
-  </script>
+  function nextImage() {
+    currentIndex = (currentIndex + 1) % imageList.length;
+    document.getElementById("lightbox-img").src = imageList[currentIndex];
+  }
+
+  function prevImage() {
+    currentIndex = (currentIndex - 1 + imageList.length) % imageList.length;
+    document.getElementById("lightbox-img").src = imageList[currentIndex];
+  }
+</script>
 </body>
 </html>
