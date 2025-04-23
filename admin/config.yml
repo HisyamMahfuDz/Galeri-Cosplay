@@ -3,7 +3,7 @@ backend:
   repo: HisyamMahfuDz/Galeri-Cosplay
   branch: main
   auth_type: implicit
-  app_id: Ov23li6VZCinEsShPsnD  # ← ini contoh, ganti sesuai app_id kamu
+  app_id: Ov23li6VZCinEsShPsnD
 
 media_folder: "images"
 public_folder: "/images"
